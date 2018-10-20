@@ -7,6 +7,7 @@ import random, pygame, sys
 from pygame.locals import *
 from hardware import *
 import RPi.GPIO as GPIO
+from multiprocessing import Process, Value
 
 GPIO.setmode(GPIO.BOARD)
 GPIO.setwarnings(False)
@@ -30,6 +31,7 @@ leftPoints = 0
 
 leftSensor = DistanceSensor("left", 13, 11)
 rightSensor = DistanceSensor("right", 37, 38)
+
 
 
 # STANDARD COLORS
@@ -63,9 +65,12 @@ def main():
                 sys.exit()
 		
 def runGame():
+    global senLeft, senRight, leftPaddleY, rightPaddleY
     #Set Positions
-    getPaddlePosistions()
+    #getPaddlePosistions()
     updateBall()
+    leftPaddleY = senLeft.value
+    rightPaddleY = senRight.value
     #Draw onto SURF
     DISPLAYSURF.fill(BGCOLOR)
     drawPaddles()
@@ -92,12 +97,13 @@ def updateBall():
         rightPoints += 1
         ballSpawn(1)
         
-def getPaddlePosistions():
-    global leftPaddleY, rightPaddleY
-    clampedLeftDist = 480-(leftSensor.getDistance()/50) * 480
-    clampedRightDist = 480-(rightSensor.getDistance()/50) * 480
-    leftPaddleY = clampedLeftDist
-    rightPaddleY = clampedRightDist
+def getPaddlePositions(senLeft, senRight):
+    while True:
+        #global leftPaddleY, rightPaddleY
+        clampedLeftDist = 480-(leftSensor.getDistance()/50) * 480
+        clampedRightDist = 480-(rightSensor.getDistance()/50) * 480
+        senLeft.value = clampedLeftDist
+        senRight.value = clampedRightDist
 
     
 def ballSpawn(xMod):
@@ -128,6 +134,11 @@ def showStartScreen():
 		#wait till confirmation
 
 if __name__ == '__main__':
+    global senLeft, senRight
+    senLeft = Value('d', 0)
+    senRight = Value('d', 0)
+    p = Process(target = getPaddlePositions, args=(senLeft, senRight))
+    p.start()
     main()
 
 
