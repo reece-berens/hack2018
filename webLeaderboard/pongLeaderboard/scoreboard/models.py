@@ -6,4 +6,4 @@ class userScore(models.Model):
 	score = models.IntegerField(default=0)
 	
 	def __str__(self):
-		return self.initials + '-' + self.score
+		return self.initials + '-' + str(self.score)
