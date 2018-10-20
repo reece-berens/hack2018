@@ -37,7 +37,6 @@ def main():
     showStartScreen()
     while True:
         runGame()
-        showGameOverScreen()
 
 def runGame():
     #Set Positions
@@ -54,7 +53,20 @@ def terminate():
     sys.exit()
 
 def drawPaddles():
-    #stuff
+    #PaddleLeft
+	paddleLeft = pygame.Rect(0,0, 50, 150)
+	pygame.draw.rect(DISPLAYSURF, WHITE, paddleLeft)
+	#PaddleRight
+	paddleRight = pygame.Rect(500,500, 50, 150)
+	pygame.draw.rect(DISPLAYSURF, WHITE, paddleRight)
 
 def drawBall():
-    #stuff
+	pygame.draw.circle(DISPLAYSURF, WHITE,(0,0), 50)
+
+def showStartScreen():
+	pass
+	while True:
+		val = 1
+		#wait till confirmation
+
+
