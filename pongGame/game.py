@@ -69,8 +69,10 @@ def runGame():
     #Set Positions
     #getPaddlePosistions()
     updateBall()
-    leftPaddleY = senLeft.value
-    rightPaddleY = senRight.value
+    if(senLeft.value <= 480 and senLeft.value >= 0):
+        leftPaddleY = senLeft.value
+    if(senRight.value <= 480 and senRight.value >= 0):
+        rightPaddleY = senRight.value
     #Draw onto SURF
     DISPLAYSURF.fill(BGCOLOR)
     drawPaddles()
