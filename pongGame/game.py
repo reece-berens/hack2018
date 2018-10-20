@@ -5,8 +5,13 @@
 
 import random, pygame, sys
 from pygame.locals import *
+from hardware import *
+import RPi.GPIO as GPIO
 
-FPS = 60
+GPIO.setmode(GPIO.BOARD)
+GPIO.setwarnings(False)
+GPIO.cleanup()
+FPS = 30
 WINDOWWIDTH = 640
 WINDOWHEIGHT = 480
 PADDLEWIDTH = 50
@@ -22,6 +27,9 @@ xVel = 2
 yVel = 2
 rightPoints = 0
 leftPoints = 0
+
+leftSensor = DistanceSensor("left", 13, 11)
+rightSensor = DistanceSensor("right", 37, 38)
 
 
 # STANDARD COLORS
@@ -55,14 +63,15 @@ def main():
                 sys.exit()
 		
 def runGame():
-	#Set Positions
-	updateBall()
-	#Draw onto SURF
-	DISPLAYSURF.fill(BGCOLOR)
-	drawPaddles()
-	drawBall()
-	pygame.display.update()
-	FPSCLOCK.tick(FPS)
+    #Set Positions
+    getPaddlePosistions()
+    updateBall()
+    #Draw onto SURF
+    DISPLAYSURF.fill(BGCOLOR)
+    drawPaddles()
+    drawBall()
+    pygame.display.update()
+    FPSCLOCK.tick(FPS)
 
 def updateBall():
     global ballX, ballY, yVel, xVel, leftPoints, rightPoints
@@ -82,6 +91,13 @@ def updateBall():
     if(ballX-ballRadius < 0): #Out of bounds lef
         rightPoints += 1
         ballSpawn(1)
+        
+def getPaddlePosistions():
+    global leftPaddleY, rightPaddleY
+    clampedLeftDist = 480-(leftSensor.getDistance()/50) * 480
+    clampedRightDist = 480-(rightSensor.getDistance()/50) * 480
+    leftPaddleY = clampedLeftDist
+    rightPaddleY = clampedRightDist
 
     
 def ballSpawn(xMod):

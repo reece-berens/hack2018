@@ -2,6 +2,7 @@ import RPi.GPIO as GPIO
 import time
 
 GPIO.setmode(GPIO.BOARD)
+GPIO.cleanup()
 
 class DistanceSensor:
 	def __init__(self, name, echoPin, triggerPin):
@@ -10,6 +11,7 @@ class DistanceSensor:
 		self.triggerPin = triggerPin
 		GPIO.setup(self.triggerPin, GPIO.OUT)
 		GPIO.setup(self.echoPin, GPIO.IN)
+		GPIO.output(self.triggerPin, False)
 	
 	def getDistance(self):
 		GPIO.output(self.triggerPin, True)
@@ -26,7 +28,8 @@ class DistanceSensor:
 			
 		TimeElapsed = StopTime - StartTime
 		
-		distance = (TimeElapsed * 34300) / 2
+		distance = TimeElapsed * 17150
+		distance = round(distance, 2)
 		
 		return distance
 		
@@ -42,3 +45,13 @@ class Button:
 			return False
 		else:
 			return True
+		    
+"""		    
+if __name__ == '__main__':
+    sensor = DistanceSensor('left', 13, 11)
+    #time.sleep(1)
+    while True:
+        value = sensor.getDistance()
+        print("Value is {}".format(value))
+        #time.sleep(.8)
+"""
