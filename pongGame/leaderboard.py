@@ -84,18 +84,18 @@ class LCD:
         self.setRGB(0, 255, 0)
         while True:
             board = getScoreboard()
-            for i in range(0, 5):
+            for i in range(0, 6):
                 topElem = ""
                 bottomElem = ""
                 if (i == 0):
                     topElem = "Leaderboard:"
                     bottomElem = "1. {} - {}".format(board[0][0], board[0][1]);
-                elif (i == 4):
+                elif (i == 5):
                     topElem =  "5. {} - {}".format(board[4][0], board[4][1]);
                     bottomElem = "Leaderboard:"
                 else:
-                    topElem = "{}. {} - {}".format(i+1, board[i-1][0], board[i-1][1])
-                    bottomElem = "{}. {} - {}".format(i+2, board[i][0], board[i][1])
+                    topElem = "{}. {} - {}".format(i, board[i-1][0], board[i-1][1])
+                    bottomElem = "{}. {} - {}".format(i+1, board[i][0], board[i][1])
                 text = "{}\n{}".format(topElem, bottomElem)
                 self.setText(text)
                 time.sleep(2)
