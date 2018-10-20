@@ -1,4 +1,4 @@
-# PONG: an experiment in terrible motion controls
+# PALM PONG: an experiment in terrible motion controls
 # By: Jarod Honas and Reece Berens
 # Music By: Cody Adams
 # Created: 10/19/2018
@@ -15,22 +15,24 @@ GPIO.setwarnings(False)
 GPIO.cleanup()
 FPS = 60
 WINDOWWIDTH = 1920 #was 640
-WINDOWHEIGHT = 1080 #was WINDOWHEIGHT
+WINDOWHEIGHT = 1080 #was 480
 PADDLEWIDTH = 50
 PADDLEHEIGHT = 150
 leftPaddleX = 0
-leftPaddleY = 0
+leftPaddleY = int(WINDOWHEIGHT/2)
 leftPaddleYApproach = 0
 rightPaddleX = WINDOWWIDTH-PADDLEWIDTH
-rightPaddleY = 0
+rightPaddleY = int(WINDOWHEIGHT/2)
 rightPaddleYApproach = 0
-ballX = 200
-ballY = 200
+ballX = int(WINDOWWIDTH/2)
+ballY = int(WINDOWHEIGHT/2)
 ballRadius = 25
-xVel = 2
+xVel = 4
 yVel = 2
 rightPoints = 0
 leftPoints = 0
+rallyCount = 0
+gameState = 0
 
 leftSensor = DistanceSensor("left", 13, 11)
 rightSensor = DistanceSensor("right", 37, 38)
@@ -48,14 +50,25 @@ DARKGRAY  = ( 40,  40,  40)
 BGCOLOR = BLACK
 
 def main():
-    global FPSCLOCK, DISPLAYSURF, BASICFONT
+    global FPSCLOCK, DISPLAYSURF, BASICFONT, leftPaddleY, rightPaddleY, leftPoints, rightPoints, rallyCount, ballX, ballY, xVel, yVel
     pygame.init()
     FPSCLOCK = pygame.time.Clock()
     DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
     BASICFONT = pygame.font.Font('freesansbold.ttf', 18)
-    pygame.display.set_caption('PONG')
-    #showStartScreen()
+    pygame.display.set_caption('PALM PONG')
     while True:
+        if(gameState == 0):
+            showStartScreen()
+            #RESET VALUES
+            ballX = int(WINDOWWIDTH/2)
+            ballY =  int(WINDOWHEIGHT/2)
+            yVel = random.randint(1, 3)
+            xVel = random.randint(1, 2)
+            leftPaddleY = int(WINDOWHEIGHT/2)
+            rightPaddleY = int(WINDOWHEIGHT/2)
+            leftPoints = 0
+            rightPoints = 0
+            rallyCount = 0
         runGame()
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -89,13 +102,15 @@ def runGame():
     DISPLAYSURF.fill(BGCOLOR)
     drawPaddles()
     drawBall()
+    drawGameText()
     pygame.display.update()
     FPSCLOCK.tick(FPS)
 
 def updateBall():
-    global ballX, ballY, yVel, xVel, leftPoints, rightPoints
+    global ballX, ballY, yVel, xVel, leftPoints, rightPoints, rallyCount, gameState
     ballX += xVel
     ballY += yVel
+    xCheck = xVel
     if(ballY-ballRadius< 0): #Top Bound
         yVel = abs(yVel)
     if(ballY+ballRadius>WINDOWHEIGHT): #Bottom Bound
@@ -106,10 +121,20 @@ def updateBall():
 	    xVel = abs(xVel) #Left Paddle Collision
     if(ballX+ballRadius>WINDOWWIDTH): #Out of bounds right
         leftPoints += 1
+        if(leftPoints >= 1):
+            gameState = 0
+            return
+        rallyCount -= 1
         ballSpawn(-1)
     if(ballX-ballRadius < 0): #Out of bounds left
         rightPoints += 1
+        if(rightPoints >= 1):
+            gameState = 0
+            return
+        rallyCount -= 1
         ballSpawn(1)
+    if(xVel != xCheck):
+        rallyCount += 1
         
 def getPaddlePositions(senLeft, senRight):
     while True:
@@ -121,13 +146,16 @@ def getPaddlePositions(senLeft, senRight):
 
     
 def ballSpawn(xMod):
-    global ballX, ballY, xVel, yVel
+    global ballX, ballY, xVel, yVel, gameState
+    if(gameState == 2): #COOP RESET
+        gameState = 0
+        return
     randX = 2 * xMod
     randY = random.randint(1, 3)
     xVel = randX
     yVel = randY
-    ballX = 200
-    ballY = 200
+    ballX = int(WINDOWWIDTH/2)
+    ballY = int(WINDOWHEIGHT/2)
 
 def drawPaddles():
     #PaddleLeft
@@ -141,16 +169,54 @@ def drawBall():
 	global ballX, ballY, DISPLAYSURF
 	pygame.draw.circle(DISPLAYSURF, WHITE,(ballX,ballY), ballRadius)
 
+def drawGameText():
+    global gameState, DISPLAYSURF, leftPoints, rightPoints
+    if(gameState == 1): #Versus Match
+        subFont = pygame.font.Font('freesansbold.ttf', 25)
+        subSurf = subFont.render(str(leftPoints) + ' | ' + str(rightPoints), True, WHITE)
+        drawRectSub = pygame.Rect(int(WINDOWWIDTH/2-50), int(50), 0,0)
+        DISPLAYSURF.blit(subSurf, drawRectSub)
+    if(gameState == 2): #Coop Match
+        subFont = pygame.font.Font('freesansbold.ttf', 25)
+        subSurf = subFont.render(str(rallyCount), True, WHITE)
+        drawRectSub = pygame.Rect(int(WINDOWWIDTH/2-50), int(50), 0,0)
+        DISPLAYSURF.blit(subSurf, drawRectSub)
+        
+def versusWinner():
+    global DISPLAYSURF
+    pass
+    
+
+def coopWinner():
+    val = 1
+
 def showStartScreen():
-	pass
+	global DISPLAYSURF, senLeft, senRight, gameState
+	titleFont = pygame.font.Font('freesansbold.ttf', 100)
+	titleSurf = titleFont.render('PALM PONG', True, WHITE)
+	drawRect = pygame.Rect(int(WINDOWWIDTH/2 - 300), int(WINDOWHEIGHT/2 - 300), 0,0)
+	subFont = pygame.font.Font('freesansbold.ttf', 25)
+	subSurf = subFont.render('LEFT SENSOR : VERSUS || COOP : RIGHT SENSOR', True, WHITE)
+	drawRectSub = pygame.Rect(int(WINDOWWIDTH/2 - 300), int(WINDOWHEIGHT/2 - 200), 0,0)
 	while True:
-		val = 1
-		#wait till confirmation
+            DISPLAYSURF.fill(BGCOLOR)
+            DISPLAYSURF.blit(titleSurf, drawRect)
+            DISPLAYSURF.blit(subSurf, drawRectSub)
+            pygame.display.update()
+            FPSCLOCK.tick(FPS)
+            if(senLeft.value > 0):
+                gameState = 1
+                return
+            if(senRight.value > 0):
+                gameState = 2
+                return
+		
+                                    
 
 if __name__ == '__main__':
     global senLeft, senRight
-    senLeft = Value('d', 0)
-    senRight = Value('d', 0)
+    senLeft = Value('d', WINDOWHEIGHT/2)
+    senRight = Value('d', WINDOWHEIGHT/2)
     p = Process(target = getPaddlePositions, args=(senLeft, senRight))
     p.start()
     main()
