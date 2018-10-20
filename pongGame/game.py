@@ -12,15 +12,17 @@ from multiprocessing import Process, Value
 GPIO.setmode(GPIO.BOARD)
 GPIO.setwarnings(False)
 GPIO.cleanup()
-FPS = 30
+FPS = 60
 WINDOWWIDTH = 640
 WINDOWHEIGHT = 480
 PADDLEWIDTH = 50
 PADDLEHEIGHT = 150
 leftPaddleX = 0
 leftPaddleY = 0
+leftPaddleYApproach = 0
 rightPaddleX = WINDOWWIDTH-PADDLEWIDTH
 rightPaddleY = 0
+rightPaddleYApproach = 0
 ballX = 200
 ballY = 200
 ballRadius = 25
@@ -65,14 +67,23 @@ def main():
                 sys.exit()
 		
 def runGame():
-    global senLeft, senRight, leftPaddleY, rightPaddleY
+    global senLeft, senRight, leftPaddleY, rightPaddleY, rightPaddleYApproach, leftPaddleYApproach
     #Set Positions
     #getPaddlePosistions()
     updateBall()
     if(senLeft.value <= 480 and senLeft.value >= 0):
-        leftPaddleY = senLeft.value
+        leftPaddleYApproach = senLeft.value
     if(senRight.value <= 480 and senRight.value >= 0):
-        rightPaddleY = senRight.value
+        rightPaddleYApproach = senRight.value
+    approachSpeed = 6
+    if(leftPaddleY-leftPaddleYApproach > 1):
+        leftPaddleY -= approachSpeed
+    if(leftPaddleY-leftPaddleYApproach < 1):
+        leftPaddleY += approachSpeed
+    if(rightPaddleY-rightPaddleYApproach > 1):
+        rightPaddleY -= approachSpeed
+    if(rightPaddleY-rightPaddleYApproach < 1):
+        rightPaddleY += approachSpeed 
     #Draw onto SURF
     DISPLAYSURF.fill(BGCOLOR)
     drawPaddles()
