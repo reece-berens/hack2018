@@ -1,5 +1,6 @@
 # PONG: an experiment in terrible motion controls
 # By: Jarod Honas and Reece Berens
+# Music By: Cody Adams
 # Created: 10/19/2018
 # HACK K-State Project
 
@@ -13,8 +14,8 @@ GPIO.setmode(GPIO.BOARD)
 GPIO.setwarnings(False)
 GPIO.cleanup()
 FPS = 60
-WINDOWWIDTH = 640
-WINDOWHEIGHT = 480
+WINDOWWIDTH = 1920 #was 640
+WINDOWHEIGHT = 1080 #was WINDOWHEIGHT
 PADDLEWIDTH = 50
 PADDLEHEIGHT = 150
 leftPaddleX = 0
@@ -46,11 +47,6 @@ DARKGREEN = (  0, 155,   0)
 DARKGRAY  = ( 40,  40,  40)
 BGCOLOR = BLACK
 
-#Set Buttons
-#SELECT = something
-#GOBACK = something
-#MOTION READOUTS
-
 def main():
     global FPSCLOCK, DISPLAYSURF, BASICFONT
     pygame.init()
@@ -71,11 +67,15 @@ def runGame():
     #Set Positions
     #getPaddlePosistions()
     updateBall()
-    if(senLeft.value <= 480 and senLeft.value >= 0):
+    
+    #MOTION READOUTS
+    if(senLeft.value <= WINDOWHEIGHT and senLeft.value >= 0):
         leftPaddleYApproach = senLeft.value
-    if(senRight.value <= 480 and senRight.value >= 0):
+    if(senRight.value <= WINDOWHEIGHT and senRight.value >= 0):
         rightPaddleYApproach = senRight.value
-    approachSpeed = 6
+        
+    #Paddle Speed and Smoothing
+    approachSpeed = 12
     if(leftPaddleY-leftPaddleYApproach > 1):
         leftPaddleY -= approachSpeed
     if(leftPaddleY-leftPaddleYApproach < 1):
@@ -83,7 +83,8 @@ def runGame():
     if(rightPaddleY-rightPaddleYApproach > 1):
         rightPaddleY -= approachSpeed
     if(rightPaddleY-rightPaddleYApproach < 1):
-        rightPaddleY += approachSpeed 
+        rightPaddleY += approachSpeed
+        
     #Draw onto SURF
     DISPLAYSURF.fill(BGCOLOR)
     drawPaddles()
@@ -93,28 +94,28 @@ def runGame():
 
 def updateBall():
     global ballX, ballY, yVel, xVel, leftPoints, rightPoints
-    ballX = ballX + xVel
-    ballY = ballY + yVel
-    if(ballY-ballRadius< 0):
+    ballX += xVel
+    ballY += yVel
+    if(ballY-ballRadius< 0): #Top Bound
         yVel = abs(yVel)
-    if(ballY+ballRadius>WINDOWHEIGHT):
+    if(ballY+ballRadius>WINDOWHEIGHT): #Bottom Bound
         yVel = abs(yVel)*-1
     if(ballX+ballRadius>rightPaddleX and (ballY > rightPaddleY and ballY < rightPaddleY+PADDLEHEIGHT)):
-        xVel = abs(xVel) * -1
+        xVel = abs(xVel) * -1 #Right Paddle Collision
     if(ballX-ballRadius<leftPaddleX+PADDLEWIDTH and (ballY > leftPaddleY and ballY < leftPaddleY+PADDLEHEIGHT)):
-	    xVel = abs(xVel)
+	    xVel = abs(xVel) #Left Paddle Collision
     if(ballX+ballRadius>WINDOWWIDTH): #Out of bounds right
         leftPoints += 1
         ballSpawn(-1)
-    if(ballX-ballRadius < 0): #Out of bounds lef
+    if(ballX-ballRadius < 0): #Out of bounds left
         rightPoints += 1
         ballSpawn(1)
         
 def getPaddlePositions(senLeft, senRight):
     while True:
-        #global leftPaddleY, rightPaddleY
-        clampedLeftDist = 480-(leftSensor.getDistance()/50) * 480
-        clampedRightDist = 480-(rightSensor.getDistance()/50) * 480
+        topBound = 40 #Max Centimeter height accepted from sensor
+        clampedLeftDist = WINDOWHEIGHT-(leftSensor.getDistance()/topBound) * WINDOWHEIGHT
+        clampedRightDist = WINDOWHEIGHT-(rightSensor.getDistance()/topBound) * WINDOWHEIGHT
         senLeft.value = clampedLeftDist
         senRight.value = clampedRightDist
 
