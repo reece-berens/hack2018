@@ -15,6 +15,14 @@ leftPaddleX = 0
 leftPaddleY = 0
 rightPaddleX = WINDOWWIDTH-PADDLEWIDTH
 rightPaddleY = 0
+ballX = 200
+ballY = 200
+ballRadius = 25
+xVel = 2
+yVel = 2
+rightPoints = 0
+leftPoints = 0
+
 
 # STANDARD COLORS
 #             R    G    B
@@ -48,17 +56,43 @@ def main():
 		
 def runGame():
 	#Set Positions
+	updateBall()
 	#Draw onto SURF
 	DISPLAYSURF.fill(BGCOLOR)
 	drawPaddles()
 	drawBall()
 	pygame.display.update()
 	FPSCLOCK.tick(FPS)
-"""
-def terminate():
-    pygame.quit()
-    sys.exit()
-"""
+
+def updateBall():
+    global ballX, ballY, yVel, xVel, leftPoints, rightPoints
+    ballX = ballX + xVel
+    ballY = ballY + yVel
+    if(ballY-ballRadius< 0):
+        yVel = abs(yVel)
+    if(ballY+ballRadius>WINDOWHEIGHT):
+        yVel = abs(yVel)*-1
+    if(ballX+ballRadius>rightPaddleX and (ballY > rightPaddleY and ballY < rightPaddleY+PADDLEHEIGHT)):
+        xVel = abs(xVel) * -1
+    if(ballX-ballRadius<leftPaddleX+PADDLEWIDTH and (ballY > leftPaddleY and ballY < leftPaddleY+PADDLEHEIGHT)):
+	    xVel = abs(xVel)
+    if(ballX+ballRadius>WINDOWWIDTH): #Out of bounds right
+        leftPoints += 1
+        ballSpawn(-1)
+    if(ballX-ballRadius < 0): #Out of bounds lef
+        rightPoints += 1
+        ballSpawn(1)
+
+    
+def ballSpawn(xMod):
+    global ballX, ballY, xVel, yVel
+    randX = 2 * xMod
+    randY = random.randint(1, 3)
+    xVel = randX
+    yVel = randY
+    ballX = 200
+    ballY = 200
+
 def drawPaddles():
     #PaddleLeft
 	paddleLeft = pygame.Rect(leftPaddleX,leftPaddleY, PADDLEWIDTH, PADDLEHEIGHT)
@@ -68,7 +102,8 @@ def drawPaddles():
 	pygame.draw.rect(DISPLAYSURF, WHITE, paddleRight)
 
 def drawBall():
-	pygame.draw.circle(DISPLAYSURF, WHITE,(200,200), 50)
+	global ballX, ballY, DISPLAYSURF
+	pygame.draw.circle(DISPLAYSURF, WHITE,(ballX,ballY), ballRadius)
 
 def showStartScreen():
 	pass
