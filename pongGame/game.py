@@ -4,7 +4,7 @@
 # HACK K-State Project
 
 import random, pygame, sys
-#Maybe -> from pygame.locals import *
+from pygame.locals import *
 
 FPS = 60
 WINDOWWIDTH = 640
@@ -27,34 +27,32 @@ BGCOLOR = BLACK
 
 def main():
     global FPSCLOCK, DISPLAYSURF, BASICFONT
-
     pygame.init()
     FPSCLOCK = pygame.time.Clock()
     DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
     BASICFONT = pygame.font.Font('freesansbold.ttf', 18)
     pygame.display.set_caption('PONG')
-
-    showStartScreen()
+    #showStartScreen()
     while True:
         runGame()
+		#pygame.display.set_caption('Hello Pygame World!')
 
 def runGame():
-    #Set Positions
-    
-
-    #Draw onto SURF
-    DISPLAYSURF.fill(BGCOLOR)
-    drawPaddles()
-    drawBall()
-
-
+	#Set Positions
+	#Draw onto SURF
+	DISPLAYSURF.fill(BGCOLOR)
+	drawPaddles()
+	drawBall()
+	pygame.display.update()
+	FPSCLOCK.tick(FPS)
+"""
 def terminate():
     pygame.quit()
     sys.exit()
-
+"""
 def drawPaddles():
     #PaddleLeft
-	paddleLeft = pygame.Rect(0,0, 50, 150)
+	paddleLeft = pygame.Rect(200,200, 50, 150)
 	pygame.draw.rect(DISPLAYSURF, WHITE, paddleLeft)
 	#PaddleRight
 	paddleRight = pygame.Rect(500,500, 50, 150)
@@ -68,5 +66,8 @@ def showStartScreen():
 	while True:
 		val = 1
 		#wait till confirmation
+
+if __name__ == '__main__':
+    main()
 
 
