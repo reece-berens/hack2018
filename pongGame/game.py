@@ -9,6 +9,7 @@ from pygame.locals import *
 from hardware import *
 import RPi.GPIO as GPIO
 from multiprocessing import Process, Value
+import time
 
 GPIO.setmode(GPIO.BOARD)
 GPIO.setwarnings(False)
@@ -33,6 +34,7 @@ rightPoints = 0
 leftPoints = 0
 rallyCount = 0
 gameState = 0
+winner = 0
 
 leftSensor = DistanceSensor("left", 13, 11)
 rightSensor = DistanceSensor("right", 37, 38)
@@ -50,7 +52,7 @@ DARKGRAY  = ( 40,  40,  40)
 BGCOLOR = BLACK
 
 def main():
-    global FPSCLOCK, DISPLAYSURF, BASICFONT, leftPaddleY, rightPaddleY, leftPoints, rightPoints, rallyCount, ballX, ballY, xVel, yVel
+    global FPSCLOCK, DISPLAYSURF, BASICFONT, leftPaddleY, rightPaddleY, leftPoints, rightPoints, rallyCount, ballX, ballY, xVel, yVel, winner
     pygame.init()
     FPSCLOCK = pygame.time.Clock()
     DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
@@ -63,13 +65,16 @@ def main():
             ballX = int(WINDOWWIDTH/2)
             ballY =  int(WINDOWHEIGHT/2)
             yVel = random.randint(1, 3)
-            xVel = random.randint(1, 2)
+            xVel = 5
             leftPaddleY = int(WINDOWHEIGHT/2)
             rightPaddleY = int(WINDOWHEIGHT/2)
             leftPoints = 0
             rightPoints = 0
             rallyCount = 0
+            winner = 0
         runGame()
+        if(gameState == 0):
+            time.sleep(2)
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
@@ -103,6 +108,7 @@ def runGame():
     drawPaddles()
     drawBall()
     drawGameText()
+    drawWinner()
     pygame.display.update()
     FPSCLOCK.tick(FPS)
 
@@ -121,17 +127,17 @@ def updateBall():
 	    xVel = abs(xVel) #Left Paddle Collision
     if(ballX+ballRadius>WINDOWWIDTH): #Out of bounds right
         leftPoints += 1
-        if(leftPoints >= 1):
+        if(leftPoints >= 3):
             gameState = 0
+            versusWinner(1)
             return
-        rallyCount -= 1
         ballSpawn(-1)
     if(ballX-ballRadius < 0): #Out of bounds left
         rightPoints += 1
-        if(rightPoints >= 1):
+        if(rightPoints >= 3):
             gameState = 0
+            versusWinner(2)
             return
-        rallyCount -= 1
         ballSpawn(1)
     if(xVel != xCheck):
         rallyCount += 1
@@ -148,6 +154,7 @@ def getPaddlePositions(senLeft, senRight):
 def ballSpawn(xMod):
     global ballX, ballY, xVel, yVel, gameState
     if(gameState == 2): #COOP RESET
+        coopWinner(xMod)
         gameState = 0
         return
     randX = 2 * xMod
@@ -178,17 +185,38 @@ def drawGameText():
         DISPLAYSURF.blit(subSurf, drawRectSub)
     if(gameState == 2): #Coop Match
         subFont = pygame.font.Font('freesansbold.ttf', 25)
-        subSurf = subFont.render(str(rallyCount), True, WHITE)
+        subSurf = subFont.render('Rally: ' + str(rallyCount), True, WHITE)
         drawRectSub = pygame.Rect(int(WINDOWWIDTH/2-50), int(50), 0,0)
         DISPLAYSURF.blit(subSurf, drawRectSub)
         
-def versusWinner():
-    global DISPLAYSURF
-    pass
+def versusWinner(val):
+    global winner
+    winner = 1
+    if(val == 2):
+        winner = 2
     
+def coopWinner(val):
+    global winner
+    winner = 3
 
-def coopWinner():
-    val = 1
+def drawWinner():
+    global DISPLAYSURF
+    if(winner == 1):
+        subFont = pygame.font.Font('freesansbold.ttf', 100)
+        subSurf = subFont.render('LEFT WINS!', True, WHITE)
+        drawRectSub = pygame.Rect(int(WINDOWWIDTH/2 - 300), int(WINDOWHEIGHT/2 - 300), 0,0)
+        DISPLAYSURF.blit(subSurf, drawRectSub)
+    if(winner == 2):
+        subFont = pygame.font.Font('freesansbold.ttf', 100)
+        subSurf = subFont.render('RIGHT WINS!', True, WHITE)
+        drawRectSub = pygame.Rect(int(WINDOWWIDTH/2 - 300), int(WINDOWHEIGHT/2 - 300), 0,0)
+        DISPLAYSURF.blit(subSurf, drawRectSub)
+    if(winner == 3):
+        subFont = pygame.font.Font('freesansbold.ttf', 100)
+        subSurf = subFont.render('RALLY COUNT: ' + str(rallyCount), True, WHITE)
+        drawRectSub = pygame.Rect(int(WINDOWWIDTH/2 - 300), int(WINDOWHEIGHT/2 - 300), 0,0)
+        DISPLAYSURF.blit(subSurf, drawRectSub)
+    
 
 def showStartScreen():
 	global DISPLAYSURF, senLeft, senRight, gameState
