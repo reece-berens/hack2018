@@ -9,6 +9,12 @@ from pygame.locals import *
 FPS = 60
 WINDOWWIDTH = 640
 WINDOWHEIGHT = 480
+PADDLEWIDTH = 50
+PADDLEHEIGHT = 150
+leftPaddleX = 0
+leftPaddleY = 0
+rightPaddleX = WINDOWWIDTH-PADDLEWIDTH
+rightPaddleY = 0
 
 # STANDARD COLORS
 #             R    G    B
@@ -35,8 +41,11 @@ def main():
     #showStartScreen()
     while True:
         runGame()
-		#pygame.display.set_caption('Hello Pygame World!')
-
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+		
 def runGame():
 	#Set Positions
 	#Draw onto SURF
@@ -52,14 +61,14 @@ def terminate():
 """
 def drawPaddles():
     #PaddleLeft
-	paddleLeft = pygame.Rect(200,200, 50, 150)
+	paddleLeft = pygame.Rect(leftPaddleX,leftPaddleY, PADDLEWIDTH, PADDLEHEIGHT)
 	pygame.draw.rect(DISPLAYSURF, WHITE, paddleLeft)
 	#PaddleRight
-	paddleRight = pygame.Rect(500,500, 50, 150)
+	paddleRight = pygame.Rect(rightPaddleX,rightPaddleY, PADDLEWIDTH, PADDLEHEIGHT)
 	pygame.draw.rect(DISPLAYSURF, WHITE, paddleRight)
 
 def drawBall():
-	pygame.draw.circle(DISPLAYSURF, WHITE,(0,0), 50)
+	pygame.draw.circle(DISPLAYSURF, WHITE,(200,200), 50)
 
 def showStartScreen():
 	pass
