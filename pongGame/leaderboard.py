@@ -102,10 +102,10 @@ class LCD:
                 
 
 def postScore(initials, score):
-	postReq = requests.post('http://10.131.39.191:8000/scoreboard/post/' + initials + '/' + str(score) + '/')
+	postReq = requests.post('http://palmpongwastaken.localtunnel.me/scoreboard/post/' + initials + '/' + str(score) + '/')
 	
 def getScoreboard():
-	getReq = requests.get('http://10.131.39.191:8000/scoreboard/get/')
+	getReq = requests.get('http://10.131.222.195:8000/scoreboard/get/')
 	arr = json.loads(getReq.text)
 	#print(arr)
 	ret = []
