@@ -2,6 +2,7 @@ from django.http import HttpResponse
 from .models import userScore
 from django.core import serializers
 import json
+from django.views.decorators.csrf import csrf_exempt
 
 def index(request):
     return HttpResponse("Index of leaderboard")
@@ -15,6 +16,7 @@ def get(request):
 	toReturn = json.dumps(scoresArr)
 	return HttpResponse(toReturn)
 
+@csrf_exempt
 def post(request, initialsParam, scoreParam):
 	#put object in database
 	obj = userScore(initials = initialsParam, score=scoreParam)
