@@ -88,11 +88,11 @@ class LCD:
                 topElem = ""
                 bottomElem = ""
                 if (i == 0):
-                    topElem = "Leaderboard:"
+                    topElem = "Top Co-op Scores:"
                     bottomElem = "1. {}".format(board[0][1]);
                 elif (i == 5):
                     topElem =  "5. {}".format(board[4][1]);
-                    bottomElem = "Leaderboard:"
+                    bottomElem = "Top Co-op Scores:"
                 else:
                     topElem = "{}. {}".format(i, board[i-1][1])
                     bottomElem = "{}. {}".format(i+1, board[i][1])
@@ -105,7 +105,7 @@ def postScore(initials, score):
 	postReq = requests.post('http://palmpongwastaken.localtunnel.me/scoreboard/post/' + initials + '/' + str(score) + '/')
 	
 def getScoreboard():
-	getReq = requests.get('http://10.131.222.195:8000/scoreboard/get/')
+	getReq = requests.get('http://palmpongwastaken.localtunnel.me/scoreboard/get/')
 	arr = json.loads(getReq.text)
 	#print(arr)
 	ret = []
