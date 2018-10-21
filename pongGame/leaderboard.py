@@ -80,7 +80,7 @@ class LCD:
         self.bus.write_i2c_block_data(self.DISPLAY_TEXT_ADDR, 0x40, pattern)
         
     def displayLeaderboard(self):
-        self.setText("Leaderboard\nLine 2")
+        #self.setText("Leaderboard\nLine 2")
         self.setRGB(0, 255, 0)
         while True:
             board = getScoreboard()
@@ -89,23 +89,23 @@ class LCD:
                 bottomElem = ""
                 if (i == 0):
                     topElem = "Leaderboard:"
-                    bottomElem = "1. {} - {}".format(board[0][0], board[0][1]);
+                    bottomElem = "1. {}".format(board[0][1]);
                 elif (i == 5):
-                    topElem =  "5. {} - {}".format(board[4][0], board[4][1]);
+                    topElem =  "5. {}".format(board[4][1]);
                     bottomElem = "Leaderboard:"
                 else:
-                    topElem = "{}. {} - {}".format(i, board[i-1][0], board[i-1][1])
-                    bottomElem = "{}. {} - {}".format(i+1, board[i][0], board[i][1])
+                    topElem = "{}. {}".format(i, board[i-1][1])
+                    bottomElem = "{}. {}".format(i+1, board[i][1])
                 text = "{}\n{}".format(topElem, bottomElem)
                 self.setText(text)
                 time.sleep(2)
                 
 
 def postScore(initials, score):
-	postReq = requests.post('localhost:8000/scoreboard/post/' + initials + '/' + str(score))
+	postReq = requests.post('http://10.131.39.191:8000/scoreboard/post/' + initials + '/' + str(score) + '/')
 	
 def getScoreboard():
-	getReq = requests.get('http://localhost:8000/scoreboard/get/')
+	getReq = requests.get('http://10.131.39.191:8000/scoreboard/get/')
 	arr = json.loads(getReq.text)
 	#print(arr)
 	ret = []

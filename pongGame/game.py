@@ -10,6 +10,7 @@ from hardware import *
 import RPi.GPIO as GPIO
 from multiprocessing import Process, Value
 import time
+from leaderboard import *
 
 GPIO.setmode(GPIO.BOARD)
 GPIO.setwarnings(False)
@@ -18,7 +19,7 @@ FPS = 60
 WINDOWWIDTH = 1920 #was 640
 WINDOWHEIGHT = 1080 #was 480
 PADDLEWIDTH = 50
-PADDLEHEIGHT = 150
+PADDLEHEIGHT = 300
 leftPaddleX = 0
 leftPaddleY = int(WINDOWHEIGHT/2)
 leftPaddleYApproach = 0
@@ -97,14 +98,15 @@ def runGame():
         
     #Paddle Speed and Smoothing
     approachSpeed = 12
+    mod = 4
     if(leftPaddleY-leftPaddleYApproach > 1):
-        leftPaddleY -= approachSpeed
+        leftPaddleY -= int(abs(leftPaddleY-leftPaddleYApproach)/100)*mod
     if(leftPaddleY-leftPaddleYApproach < 1):
-        leftPaddleY += approachSpeed
+        leftPaddleY += int(abs(leftPaddleY-leftPaddleYApproach)/100)*mod
     if(rightPaddleY-rightPaddleYApproach > 1):
-        rightPaddleY -= approachSpeed 
+        rightPaddleY -= int(abs(rightPaddleY-rightPaddleYApproach)/100) *mod
     if(rightPaddleY-rightPaddleYApproach < 1):
-        rightPaddleY += approachSpeed 
+        rightPaddleY += int(abs(rightPaddleY-rightPaddleYApproach)/100) *mod
         
     #Draw onto SURF
     DISPLAYSURF.fill(BGCOLOR)
@@ -121,9 +123,9 @@ def updateBall():
     ballY += yVel
     xCheck = xVel
     rallyMod = 1
-    if(ballY-ballRadius< 0): #Top Bound
+    if(ballY-ballRadius< 125): #Top Bound
         yVel = abs(yVel)
-    if(ballY+ballRadius>WINDOWHEIGHT): #Bottom Bound
+    if(ballY+ballRadius>WINDOWHEIGHT-60): #Bottom Bound
         yVel = abs(yVel)*-1
     if(ballX+ballRadius>rightPaddleX and (ballY > rightPaddleY and ballY < rightPaddleY+PADDLEHEIGHT)):
         xVel = abs(xVel) * -1 #Right Paddle Collision
@@ -132,14 +134,14 @@ def updateBall():
 	    xVel = abs(xVel) #Left Paddle Collision
     if(ballX+ballRadius>WINDOWWIDTH): #Out of bounds right
         leftPoints += 1
-        if(leftPoints >= 3):
+        if(leftPoints >= 100):
             gameState = 0
             versusWinner(1)
             return
         ballSpawn(-1)
     if(ballX-ballRadius < 0): #Out of bounds left
         rightPoints += 1
-        if(rightPoints >= 3):
+        if(rightPoints >= 100):
             gameState = 0
             versusWinner(2)
             return
@@ -150,9 +152,9 @@ def updateBall():
         
 def getPaddlePositions(senLeft, senRight):
     while True:
-        topBound = 40 #Max Centimeter height accepted from sensor
-        clampedLeftDist = WINDOWHEIGHT-(leftSensor.getDistance()/topBound) * WINDOWHEIGHT
-        clampedRightDist = WINDOWHEIGHT-(rightSensor.getDistance()/topBound) * WINDOWHEIGHT
+        topBound = 25 #Max Centimeter height accepted from sensor
+        clampedLeftDist = WINDOWHEIGHT-((leftSensor.getDistance()/topBound) * WINDOWHEIGHT)
+        clampedRightDist = WINDOWHEIGHT-((rightSensor.getDistance()/topBound) * WINDOWHEIGHT)
         senLeft.value = clampedLeftDist
         senRight.value = clampedRightDist
 
@@ -203,6 +205,7 @@ def versusWinner(val):
     
 def coopWinner(val):
     global winner
+    postScore("AAA", rallyCount)
     winner = 3
 
 def drawWinner():
@@ -248,6 +251,9 @@ def showStartScreen():
                                     
 
 if __name__ == '__main__':
+    lcd = LCD()
+    l = Process(target = lcd.displayLeaderboard)
+    l.start()
     global senLeft, senRight
     senLeft = Value('d', WINDOWHEIGHT/2)
     senRight = Value('d', WINDOWHEIGHT/2)
