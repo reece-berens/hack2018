@@ -134,14 +134,14 @@ def updateBall():
 	    xVel = abs(xVel) #Left Paddle Collision
     if(ballX+ballRadius>WINDOWWIDTH): #Out of bounds right
         leftPoints += 1
-        if(leftPoints >= 100):
+        if(leftPoints >= 3):
             gameState = 0
             versusWinner(1)
             return
         ballSpawn(-1)
     if(ballX-ballRadius < 0): #Out of bounds left
         rightPoints += 1
-        if(rightPoints >= 100):
+        if(rightPoints >= 3):
             gameState = 0
             versusWinner(2)
             return
