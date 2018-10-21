@@ -88,11 +88,11 @@ class LCD:
                 topElem = ""
                 bottomElem = ""
                 if (i == 0):
-                    topElem = "Top Co-op Scores:"
+                    topElem = "Top Co-op Scores"
                     bottomElem = "1. {}".format(board[0][1]);
                 elif (i == 5):
                     topElem =  "5. {}".format(board[4][1]);
-                    bottomElem = "Top Co-op Scores:"
+                    bottomElem = "Top Co-op Scores"
                 else:
                     topElem = "{}. {}".format(i, board[i-1][1])
                     bottomElem = "{}. {}".format(i+1, board[i][1])
