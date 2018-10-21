@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<script>
+			obj = { table: "customers", limit: 20 };
+			dbParam = JSON.stringify(obj);
+			xmlhttp = new XMLHttpRequest();
+			xmlhttp.onreadystatechange = function() {
+				txt = "";
+				//console.log(this.responseText);
+				if (this.status == 200 && this.readyState == 4) {
+					myObj = JSON.parse(this.responseText);
+					txt += "<table>"
+					for (x in myObj) {
+						txt += "<tr><td>";
+						switch(x)
+						{
+							case '0':
+								txt += "1st Place: ";
+								break;
+							case '1':
+								txt += "2nd Place: ";
+								break;
+							case '2':
+								txt += "3rd Place: ";
+								break;
+							case '3':
+								txt += "4th Place: ";
+								break;
+							case '4':
+								txt += "5th Place: ";
+								break;
+							default:
+								txt += "Nah fam";
+								break;
+						}
+						txt += "</td>";
+						txt += "<td>" + myObj[x].split("-")[1] + "</td></tr>";
+					}
+					txt += "</table>" 
+					document.getElementById("demo").innerHTML = txt;
+				}
+			}
+			
+			xmlhttp.onerror = function() {
+				txt = "<p>Uh oh, something may be wrong. Check and make sure the server is on.</p>"
+				document.getElementById("demo").innerHTML = txt;
+			}
+			xmlhttp.open("GET", "http://palmpongwastaken.localtunnel.me/scoreboard/get/", true);
+			xmlhttp.send("");
+		</script>
+
+	</head>
+
+	<body>
+		<h1>Top Scores for Co-op Pong</h1>
+		<div id="demo"></div>
+	</body>
+</html>
