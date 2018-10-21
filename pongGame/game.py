@@ -102,9 +102,9 @@ def runGame():
     if(leftPaddleY-leftPaddleYApproach < 1):
         leftPaddleY += approachSpeed
     if(rightPaddleY-rightPaddleYApproach > 1):
-        rightPaddleY -= approachSpeed
+        rightPaddleY -= approachSpeed 
     if(rightPaddleY-rightPaddleYApproach < 1):
-        rightPaddleY += approachSpeed
+        rightPaddleY += approachSpeed 
         
     #Draw onto SURF
     DISPLAYSURF.fill(BGCOLOR)
@@ -120,12 +120,14 @@ def updateBall():
     ballX += xVel
     ballY += yVel
     xCheck = xVel
+    rallyMod = 1
     if(ballY-ballRadius< 0): #Top Bound
         yVel = abs(yVel)
     if(ballY+ballRadius>WINDOWHEIGHT): #Bottom Bound
         yVel = abs(yVel)*-1
     if(ballX+ballRadius>rightPaddleX and (ballY > rightPaddleY and ballY < rightPaddleY+PADDLEHEIGHT)):
         xVel = abs(xVel) * -1 #Right Paddle Collision
+        rallyMod = -1
     if(ballX-ballRadius<leftPaddleX+PADDLEWIDTH and (ballY > leftPaddleY and ballY < leftPaddleY+PADDLEHEIGHT)):
 	    xVel = abs(xVel) #Left Paddle Collision
     if(ballX+ballRadius>WINDOWWIDTH): #Out of bounds right
@@ -143,6 +145,7 @@ def updateBall():
             return
         ballSpawn(1)
     if(xVel != xCheck):
+        xVel += 1 * rallyMod
         rallyCount += 1
         
 def getPaddlePositions(senLeft, senRight):
@@ -177,7 +180,7 @@ def drawPaddles():
 
 def drawBall():
 	global ballX, ballY, DISPLAYSURF
-	pygame.draw.circle(DISPLAYSURF, WHITE,(ballX,ballY), ballRadius)
+	pygame.draw.circle(DISPLAYSURF, WHITE,(int(ballX),int(ballY)), ballRadius)
 
 def drawGameText():
     global gameState, DISPLAYSURF, leftPoints, rightPoints
