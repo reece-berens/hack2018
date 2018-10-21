@@ -10,6 +10,8 @@ from hardware import *
 import RPi.GPIO as GPIO
 from multiprocessing import Process, Value
 import time
+import tkinter as tk
+from tkinter import simpledialog
 
 GPIO.setmode(GPIO.BOARD)
 GPIO.setwarnings(False)
@@ -36,6 +38,7 @@ rallyCount = 0
 gameState = 0
 winner = 0
 
+
 leftSensor = DistanceSensor("left", 13, 11)
 rightSensor = DistanceSensor("right", 37, 38)
 
@@ -52,7 +55,7 @@ DARKGRAY  = ( 40,  40,  40)
 BGCOLOR = BLACK
 
 def main():
-    global FPSCLOCK, DISPLAYSURF, BASICFONT, leftPaddleY, rightPaddleY, leftPoints, rightPoints, rallyCount, ballX, ballY, xVel, yVel, winner
+    global FPSCLOCK, DISPLAYSURF, BASICFONT, leftPaddleY, rightPaddleY, leftPoints, rightPoints, rallyCount, ballX, ballY, xVel, yVel, winner, window
     pygame.init()
     FPSCLOCK = pygame.time.Clock()
     DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
@@ -197,6 +200,10 @@ def versusWinner(val):
     
 def coopWinner(val):
     global winner
+    application_window = tk.Tk()
+    answer = simpledialog.askstring("Initials", "What are your initials?", parent = application_window)
+    ans = answer
+    application_window.destroy()
     winner = 3
 
 def drawWinner():
