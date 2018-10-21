@@ -10,8 +10,6 @@ from hardware import *
 import RPi.GPIO as GPIO
 from multiprocessing import Process, Value
 import time
-import tkinter as tk
-from tkinter import simpledialog
 
 GPIO.setmode(GPIO.BOARD)
 GPIO.setwarnings(False)
@@ -57,6 +55,8 @@ BGCOLOR = BLACK
 def main():
     global FPSCLOCK, DISPLAYSURF, BASICFONT, leftPaddleY, rightPaddleY, leftPoints, rightPoints, rallyCount, ballX, ballY, xVel, yVel, winner, window
     pygame.init()
+    pygame.mixer.music.load("hack 1 audio.ogg")
+    pygame.mixer.music.play(-1)
     FPSCLOCK = pygame.time.Clock()
     DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
     BASICFONT = pygame.font.Font('freesansbold.ttf', 18)
@@ -163,7 +163,7 @@ def ballSpawn(xMod):
         coopWinner(xMod)
         gameState = 0
         return
-    randX = 2 * xMod
+    randX = 5 * xMod
     randY = random.randint(1, 3)
     xVel = randX
     yVel = randY
@@ -203,10 +203,6 @@ def versusWinner(val):
     
 def coopWinner(val):
     global winner
-    application_window = tk.Tk()
-    answer = simpledialog.askstring("Initials", "What are your initials?", parent = application_window)
-    ans = answer
-    application_window.destroy()
     winner = 3
 
 def drawWinner():
