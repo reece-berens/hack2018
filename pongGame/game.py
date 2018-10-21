@@ -233,7 +233,7 @@ def showStartScreen():
 	titleSurf = titleFont.render('PALM PONG', True, WHITE)
 	drawRect = pygame.Rect(int(WINDOWWIDTH/2 - 300), int(WINDOWHEIGHT/2 - 300), 0,0)
 	subFont = pygame.font.Font('freesansbold.ttf', 25)
-	subSurf = subFont.render('LEFT SENSOR : VERSUS || COOP : RIGHT SENSOR', True, WHITE)
+	subSurf = subFont.render('LEFT SENSOR : VERSUS || CO-OP : RIGHT SENSOR', True, WHITE)
 	drawRectSub = pygame.Rect(int(WINDOWWIDTH/2 - 300), int(WINDOWHEIGHT/2 - 200), 0,0)
 	while True:
             DISPLAYSURF.fill(BGCOLOR)
